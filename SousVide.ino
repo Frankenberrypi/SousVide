@@ -1,6 +1,6 @@
 #include <OneWire.h>
 
-float lowSet = 60; // Low temp where relay turns on
+float lowSet = 30; // Low temp where relay turns on
 //float highSet = 134.6; // High temp where relay turns off
 
 OneWire  ds(3);  // on pin 3 (a 4.7K resistor is necessary)
@@ -11,33 +11,29 @@ double mins;
 double hrs;
 
 //Relay #8 controlled by thermostat, pin 12
-int relayPin1 = 5;               
-int relayPin2 = 6;            
-int relayPin3 = 7;               
-int relayPin4 = 8;    
-int relayPin5 = 9;
-int relayPin6 = 10;
-int relayPin7 = 11;
 int relayPin8 = 12;
+
+// Red preheat light, pin 10
+int preheating = 10;
+
+// Green ready light, pin 11
+int running = 11;
+
+// Variable to control LED indicator lights
+boolean preheat = true;
 
 void setup() {
   Serial.begin(9600);
-  pinMode(relayPin1, OUTPUT);      // sets the digital pin as output
-  pinMode(relayPin2, OUTPUT);      // sets the digital pin as output
-  pinMode(relayPin3, OUTPUT);      // sets the digital pin as output
-  pinMode(relayPin4, OUTPUT);      // sets the digital pin as output
-  pinMode(relayPin5, OUTPUT);      // sets the digital pin as output
-  pinMode(relayPin6, OUTPUT);      // sets the digital pin as output
-  pinMode(relayPin7, OUTPUT);      // sets the digital pin as output
   pinMode(relayPin8, OUTPUT);      // sets the digital pin as output  
-  digitalWrite(relayPin1, HIGH);        // Prevents relays from starting up engaged
-  digitalWrite(relayPin2, HIGH);        // Prevents relays from starting up engaged
-  digitalWrite(relayPin3, HIGH);        // Prevents relays from starting up engaged
-  digitalWrite(relayPin4, HIGH);        // Prevents relays from starting up engaged
-  digitalWrite(relayPin5, HIGH);        // Prevents relays from starting up engaged
-  digitalWrite(relayPin6, HIGH);        // Prevents relays from starting up engaged
-  digitalWrite(relayPin7, HIGH);        // Prevents relays from starting up engaged
   digitalWrite(relayPin8, HIGH);        // Prevents relays from starting up engaged
+  
+  // indicator light pin settings
+  pinMode(preheating, OUTPUT);
+  pinMode(running, OUTPUT);
+  
+  // start with the preheating light on, the running light off
+  digitalWrite(preheating, HIGH);
+  digitalWrite(running, LOW);
 }
 
 void loop(void) {
@@ -131,13 +127,19 @@ void loop(void) {
   Serial.println(fahrenheit);
   //Serial.println(" Fahrenheit");
   
-  /*----------
-  Relay control section, limits set in lines 3 and 4
-  ----------*/
+  // Relay control section, limits set in lines 3 and 4
   if (celsius < lowSet) {
     relayOn (relayPin8);
   } else {
     relayOff (relayPin8);
+  }
+  
+  Serial.print(preheat);
+  // Indicator light control
+  if ((celsius > lowSet) && (preheat = true)){
+    preheat = false;
+    digitalWrite(preheating, LOW);
+    digitalWrite(running, HIGH);
   }
 }
 
