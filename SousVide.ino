@@ -1,6 +1,6 @@
 #include <OneWire.h>
 
-float lowSet = 30; // Low temp where relay turns on
+float lowSet = 55; // Low temp where relay turns on
 //float highSet = 134.6; // High temp where relay turns off
 
 OneWire  ds(3);  // on pin 3 (a 4.7K resistor is necessary)
